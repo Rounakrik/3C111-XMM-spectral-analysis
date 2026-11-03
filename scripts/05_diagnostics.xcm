@@ -1,0 +1,17 @@
+# Part C diagnostics: where does the excess chi^2 come from? (Model 2)
+query yes
+log results/xspec_diagnostics.log
+@results/best_fit_m2.xcm
+set fh [open results/diagnostics.txt w]
+fit 200
+puts $fh "band_0.3-10 chi2=[tcloutr stat] dof=[lindex [tcloutr dof] 0] nH=[lindex [tcloutr param 1] 0] Gamma=[lindex [tcloutr param 2] 0]"
+ignore **-0.5
+fit 200
+puts $fh "band_0.5-10 chi2=[tcloutr stat] dof=[lindex [tcloutr dof] 0] nH=[lindex [tcloutr param 1] 0] Gamma=[lindex [tcloutr param 2] 0]"
+ignore **-3.0
+freeze 1
+fit 200
+puts $fh "band_3-10(nH frozen) chi2=[tcloutr stat] dof=[lindex [tcloutr dof] 0] nH=[lindex [tcloutr param 1] 0] Gamma=[lindex [tcloutr param 2] 0] LineE=[lindex [tcloutr param 5] 0]"
+close $fh
+log none
+exit

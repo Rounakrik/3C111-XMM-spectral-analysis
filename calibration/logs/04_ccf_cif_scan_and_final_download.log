@@ -1,0 +1,31 @@
+(sas) ron@Phoenix:~/sas/SPASE/part_c$ cd ~/sas/SPASE
+grep -a -o "[A-Z0-9_]*_[0-9]\{4\}\.CCF" ccf.cif | sort -u > ccf_all_in_cif.txt
+wc -l ccf_all_in_cif.txt
+grep -E "^(EPN|XRT3|XMM)_" ccf_all_in_cif.txt | grep -v "^EPN_FWC_0005.CCF$" > ccf_wanted.txt
+while read f; do [ -s CCF/$f ] || echo $f; done < ccf_wanted.txt > ccf_missing.txt
+echo "Still missing:"; cat ccf_missing.txt
+129 ccf_all_in_cif.txt
+Still missing:
+XRT3_XAREAEF_0014.CCF
+XRT3_XENCIREN_0003.CCF
+(sas) ron@Phoenix:~/sas/SPASE$ sed -i 's#^LIST=.*#LIST=~/sas/SPASE/ccf_missing.txt#' ~/sas/SPASE/download_ccf.sh
+grep -n "^LIST" ~/sas/SPASE/download_ccf.sh
+~/sas/SPASE/download_ccf.sh
+2:LIST=~/sas/SPASE/ccf_missing.txt
+Files still to download: 2
+Checking file sizes...
+Total to download: 377KB
+
+=== [1/2] XRT3_XAREAEF_0014.CCF  (113KB) ===
+############################################################################################################### 100.0%
+  done in 6s
+  overall: 113KB of 377KB, 6s elapsed, 1/2 files
+
+=== [2/2] XRT3_XENCIREN_0003.CCF  (265KB) ===
+############################################################################################################### 100.0%
+  done in 4s
+  overall: 377KB of 377KB, 10s elapsed, 2/2 files
+
+========== SUMMARY ==========
+Downloaded: 2 of 2 files, 377KB
+Total time: 10s

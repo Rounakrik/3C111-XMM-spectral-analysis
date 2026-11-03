@@ -1,0 +1,157 @@
+# =====================================================================
+# Part C - XSPEC fit of the 3C 111 EPIC-pn spectrum (obs. 0552180101)
+# Model 1: tbabs*zpowerlw            (absorbed power law)
+# Model 2: tbabs*(zpowerlw+zgauss)   (+ Fe K-alpha line, 6.4 keV rest)
+# Errors: 90% confidence (delta chi^2 = 2.706)
+# Run from part_c/:   xspec <<< "@scripts/02_fit_spectrum.xcm"
+# =====================================================================
+log results/xspec_partC.log
+query yes
+abund wilm
+xsect vern
+statistic chi
+cosmo 70 0 0.73
+cpd /null
+setplot energy
+
+data pn_src_grp.pi
+ignore bad
+ignore **-0.3 10.0-**
+
+set fh [open results/fit_results.txt w]
+
+# ---- helper: PostScript plot + QDP data dump for matplotlib ----
+proc saveplot {name cmd} {
+  cpd figures/raw/$name.ps/cps
+  setplot command wdata results/qdp_$name.qdp
+  eval plot $cmd
+  setplot delete all
+  cpd /null
+}
+
+# ---- helper: parameters with 90% errors, and fit statistic ----
+proc savepars {fh tag plist} {
+  foreach {n name} $plist {
+    set p [tcloutr param $n]
+    set e [tcloutr error $n]
+    puts $fh "${tag}_$name [lindex $p 0] [lindex $e 0] [lindex $e 1] [lindex $e 2]"
+  }
+  puts $fh "${tag}_chi2 [tcloutr stat] [lindex [tcloutr dof] 0]"
+}
+
+# ---- helper: observed fluxes (with errors), unabsorbed fluxes, luminosities ----
+proc savefluxes {fh tag} {
+  set bands {{0.3 10.0 0.3-10} {2.0 10.0 2-10} {0.5 2.0 0.5-2}}
+  foreach b $bands {
+    flux [lindex $b 0] [lindex $b 1] err 1000 90
+    puts $fh "${tag}_Fobs_[lindex $b 2] [lrange [tcloutr flux 1] 0 2]"
+  }
+  flux 0.99 1.01
+  puts $fh "${tag}_Fobs_1keV [lindex [tcloutr flux 1] 0]"
+  set nH [lindex [tcloutr param 1] 0]
+  newpar 1 0
+  foreach b $bands {
+    flux [lindex $b 0] [lindex $b 1]
+    puts $fh "${tag}_Funabs_[lindex $b 2] [lindex [tcloutr flux 1] 0]"
+  }
+  flux 0.99 1.01
+  puts $fh "${tag}_Funabs_1keV [lindex [tcloutr flux 1] 0]"
+  lumin 2.0 10.0 0.049
+  puts $fh "${tag}_Lxspec_2-10 [lindex [tcloutr lumin 1] 0]"
+  lumin 0.3 10.0 0.049
+  puts $fh "${tag}_Lxspec_0.3-10 [lindex [tcloutr lumin 1] 0]"
+  newpar 1 $nH
+}
+
+# ================= Plot 1: background-subtracted spectrum =================
+saveplot fig01_spectrum ldata
+
+# ================= Model 1: absorbed power law =================
+model tbabs*zpowerlw & /*
+newpar 1 0.9
+newpar 2 1.7
+newpar 3 0.049
+freeze 3
+newpar 4 0.01
+fit 200
+fit 200
+error maximum 10.0 2.706 1 2 4
+savepars $fh m1 {1 nH 2 Gamma 4 norm}
+saveplot fig02_fit_m1 "ldata delchi"
+saveplot fig03_ratio_m1 ratio
+save all results/best_fit_m1.xcm
+savefluxes $fh m1
+
+# ================= Model 2: absorbed power law + Fe K-alpha =================
+set nH1 [lindex [tcloutr param 1] 0]
+set G1  [lindex [tcloutr param 2] 0]
+set K1  [lindex [tcloutr param 4] 0]
+model tbabs*(zpowerlw+zgauss) & /*
+newpar 1 $nH1
+newpar 2 $G1
+newpar 3 0.049
+freeze 3
+newpar 4 $K1
+newpar 5 6.4 0.01 5.8 5.8 7.2 7.2
+newpar 6 0.05 0.01 0.0 0.0 0.5 0.5
+newpar 7 0.049
+freeze 7
+newpar 8 5e-5 1e-6 0 0 1e-2 1e-2
+fit 200
+fit 200
+error maximum 10.0 2.706 1 2 4 5 6 8
+savepars $fh m2 {1 nH 2 Gamma 4 norm 5 LineE 6 Sigma 8 LineNorm}
+eqwidth 3 err 1000 90
+puts $fh "m2_EW [lrange [tcloutr eqwidth 1] 0 2]"
+saveplot fig04_fit_m2 "ldata delchi"
+saveplot fig05_unfolded_m2 eeufspec
+save all results/best_fit_m2.xcm
+savefluxes $fh m2
+
+# ===== Model 2: unabsorbed flux (cflux) and luminosity (clumin) with errors =====
+set nH2 [lindex [tcloutr param 1] 0]
+set G2  [lindex [tcloutr param 2] 0]
+set K2  [lindex [tcloutr param 4] 0]
+set E2  [lindex [tcloutr param 5] 0]
+set S2  [lindex [tcloutr param 6] 0]
+set N2  [lindex [tcloutr param 8] 0]
+foreach b {{2.0 10.0 2-10} {0.3 10.0 0.3-10}} {
+  model tbabs*cflux(zpowerlw+zgauss) & /*
+  newpar 1 $nH2
+  newpar 2 [lindex $b 0]
+  newpar 3 [lindex $b 1]
+  newpar 4 -10.3
+  newpar 5 $G2
+  newpar 6 0.049
+  newpar 7 $K2
+  freeze 7
+  newpar 8 $E2
+  newpar 9 $S2
+  newpar 10 0.049
+  newpar 11 $N2
+  fit 200
+  error maximum 10.0 2.706 4
+  puts $fh "m2_cflux_[lindex $b 2] [lindex [tcloutr param 4] 0] [lrange [tcloutr error 4] 0 1]"
+
+  model tbabs*clumin(zpowerlw+zgauss) & /*
+  newpar 1 $nH2
+  newpar 2 [lindex $b 0]
+  newpar 3 [lindex $b 1]
+  newpar 4 0.049
+  newpar 5 44.5
+  newpar 6 $G2
+  newpar 7 0.049
+  newpar 8 $K2
+  freeze 8
+  newpar 9 $E2
+  newpar 10 $S2
+  newpar 11 0.049
+  newpar 12 $N2
+  fit 200
+  error maximum 10.0 2.706 5
+  puts $fh "m2_clumin_[lindex $b 2] [lindex [tcloutr param 5] 0] [lrange [tcloutr error 5] 0 1]"
+}
+
+close $fh
+log none
+exit

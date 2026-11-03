@@ -1,0 +1,7 @@
+# rmfgen/arfgen re-run after all CCFs were in place: responses now written
+specgroup:- specgroup (specgroup-1.7.1)  [22.1.0-a8f2c2afa-20250304] started:  2026-11-03T08:24:36.000
+specgroup:- Prepared spectrum pn_src_grp.pi with 218 groups
+specgroup:- specgroup (specgroup-1.7.1)  [22.1.0-a8f2c2afa-20250304] ended:    2026-11-03T08:24:36.000
+-rw-rw-r-- 1 ron ron  34K Nov  3 13:54 pn_src.arf
+-rw-rw-r-- 1 ron ron 6.4M Nov  3 13:54 pn_src.rmf
+-rw-rw-r-- 1 ron ron  71K Nov  3 13:54 pn_src_grp.pi

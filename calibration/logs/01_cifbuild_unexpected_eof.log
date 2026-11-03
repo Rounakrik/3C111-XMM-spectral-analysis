@@ -1,0 +1,10 @@
+(sas) ron@Phoenix:~/sas/SPASE/part_c$ cd ~/sas/SPASE/part_c
+rm -f ccf.cif
+export SAS_CCFPATH=$HOME/sas/SPASE/CCF
+export SAS_ODF=$PWD/1683_0552180101_SCX00000SUM.SAS
+cifbuild
+export SAS_CCF=$PWD/ccf.cif
+cifbuild:- Executing (routine): cifbuild calindexset=ccf.cif ccfpath=. withccfpath=no usecanonicalname=no recurse=no fileglob=*.ccf|*.CCF fullpath=no observationdate=now withobservationdate=no analysisdate=now category=XMMCCF ignorecategory=no masterindex=no masterindexset=ccf.mif withmasterindexset=no append=no  -w 1 -V 4
+cifbuild:- cifbuild (cifbuild-4.10.1)  [22.1.0-a8f2c2afa-20250304] started:  2026-11-03T07:17:33.000
+cifbuild:- Will ask the analysis date to the OAL.
+** cifbuild: error (UnexpectedEOF), Unexpected EOF in line #435 of ODF summary file `/home/ron/sas/SPASE/part_c/1683_0552180101_SCX00000SUM.SAS'
