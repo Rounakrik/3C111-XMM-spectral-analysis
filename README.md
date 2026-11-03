@@ -260,7 +260,7 @@ More detail is in [`calibration/README.md`](calibration/README.md) and [`docs/tr
 ## Author
 
 **Rounak Mukherjee**
-Part C of Project 6, *XMM-Newton observation of the AGN 3C 111*.
+*XMM-Newton observation of the AGN 3C 111*
 
 Based on observations obtained with XMM-Newton, an ESA science mission with instruments and contributions directly funded by ESA Member States and NASA.
 
