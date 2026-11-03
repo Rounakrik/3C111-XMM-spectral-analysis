@@ -10,7 +10,7 @@
 ![LaTeX](https://img.shields.io/badge/Report-LaTeX-008080?logo=latex&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-lightgrey)
 
-<img src="figures/fig04_fit_powerlaw_FeKa.png" width="620" alt="EPIC-pn spectrum of 3C 111 with the absorbed power law plus Fe K-alpha model">
+
 
 *EPIC-pn spectrum of 3C 111 fitted with an absorbed power law plus a Gaussian Fe Kα line.*
 
