@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite it as below."
+title: "X-ray spectral analysis of the radio galaxy 3C 111 with XMM-Newton EPIC-pn (ObsID 0552180101)"
+authors:
+  - family-names: Pal
+    given-names: Panchatapa
+date-released: 2026-11-03
+license: MIT
+keywords: [XMM-Newton, X-ray spectroscopy, AGN, 3C 111, XSPEC, SAS]
